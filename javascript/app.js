@@ -61,8 +61,10 @@ function displayAlbumsAndTracks(event) {
   var appendToMe = $('#albums-and-tracks');
   var id = $(event.target).attr('data-spotify-id');
   var albums;
+  var albumsVerbose = [];
   var tracks = [];
   var albumNames = [];
+  var albumDates = [];
   var albumIDs = [];
   var searchURLA = "https://api.spotify.com/v1/artists/" + $(event.target).attr('data-spotify-id') + "/albums";
 
@@ -74,10 +76,21 @@ function displayAlbumsAndTracks(event) {
 
   albums.done(function(data){
     for (var i = 0; i < data.items.length; i++) {
-      albumNames.push(data.items[i]);
+      albumsVerbose[i] = $.ajax({
+        type: "GET",
+        dataType: "json",
+        url: data.items[i].href
+      })
+      albumNames.push(data.items[i].name);
       albumIDs.push(data.items[i].id);
     }
+    albumsVerbose[19].done(function(data){
+      for (var i = 0; i < albumsVerbose.length; i++) {
+        albumDates[i] = albumsVerbose[i].responseJSON.release_date;
+      }
+    })
   })
+
   albums.done(function(data){
     for (var i = 0; i < albumIDs.length; i++) {
       tracks[i] = $.ajax({
@@ -89,8 +102,7 @@ function displayAlbumsAndTracks(event) {
     tracks[19].done(function(data){
       for (var i = 0; i < albumNames.length; i++) {
         var albumTracks = tracks[i].responseJSON.items;
-        appendToMe.append('<p>' + albumNames[i].name + '</p>');
-        console.log(albumNames[i]);
+        appendToMe.append('<p>' + albumNames[i] + ' - ' + albumDates[i] + '</p>');
         for (var j = 0; j < albumTracks.length; j++) {
           appendToMe.append('<li>' + albumTracks[j].name + '</li>');
         }
