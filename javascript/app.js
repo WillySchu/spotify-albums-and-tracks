@@ -73,25 +73,30 @@ function displayAlbumsAndTracks(event) {
   });
 
   albums.done(function(data){
-    console.log(data);
-    console.log(data.items);
-
     for (var i = 0; i < data.items.length; i++) {
-      albumNames.push(data.items[i].name);
+      albumNames.push(data.items[i]);
       albumIDs.push(data.items[i].id);
-      console.log(data.items[i].name);
     }
   })
-
-  for (var i = 0; i < albumIDs.length; i++) {
-    tracks[0] = $.ajax({
-      type: "GET",
-      dataType: "json",
-      url: "https://api.spotify.com/v1/albums/" + albumIDs[i] + "/tracks"
+  albums.done(function(data){
+    for (var i = 0; i < albumIDs.length; i++) {
+      tracks[i] = $.ajax({
+        type: "GET",
+        dataType: "json",
+        url: "https://api.spotify.com/v1/albums/" + albumIDs[i] + "/tracks"
+      })
+    }
+    tracks[19].done(function(data){
+      for (var i = 0; i < albumNames.length; i++) {
+        var albumTracks = tracks[i].responseJSON.items;
+        appendToMe.append('<p>' + albumNames[i].name + '</p>');
+        console.log(albumNames[i]);
+        for (var j = 0; j < albumTracks.length; j++) {
+          appendToMe.append('<li>' + albumTracks[j].name + '</li>');
+        }
+      }
     })
-  }
-
-  console.log(tracks);
+  })
 
 
   console.log("you clicked on:");
